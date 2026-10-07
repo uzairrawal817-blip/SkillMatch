@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% from "macros.html" import toast %}
+
+{% block title %}Sign in · SkillMatch{% endblock %}
+
+{% block content %}
+  <section class="not-found-panel" aria-labelledby="login-title">
+    <p class="eyebrow">Welcome back</p>
+    <h1 id="login-title">Sign in to SkillMatch</h1>
+    <p>Use your campus account to manage your volunteer profile.</p>
+
+    <div id="auth-message" aria-live="polite">
+      {% for category, message in get_flashed_messages(with_categories=true) %}
+        {{ toast(message, category) }}
+      {% endfor %}
+    </div>
+
+    <form method="post"
+          action="{{ url_for('auth.login') }}"
+          hx-post="{{ url_for('auth.login') }}"
+          hx-target="#auth-message"
+          hx-swap="innerHTML">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <input type="hidden" name="next" value="{{ next_url or '' }}">
+
+      <p>
+        <label for="username">Username</label><br>
+        <input id="username" name="username" type="text" value="{{ username }}"
+               autocomplete="username" required maxlength="64">
+      </p>
+      <p>
+        <label for="password">Password</label><br>
+        <input id="password" name="password" type="password"
+               autocomplete="current-password" required>
+      </p>
+      <button class="button button--primary" type="submit">Sign in</button>
+    </form>
+
+    <p>New to SkillMatch? <a href="{{ url_for('auth.register') }}">Create an account</a>.</p>
+  </section>
+{% endblock %}

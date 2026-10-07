@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% from "macros.html" import empty_state, toast %}
+
+{% block title %}{% if editing %}Edit profile{% else %}Your profile{% endif %} · SkillMatch{% endblock %}
+
+{% block content %}
+  <section class="not-found-panel" aria-labelledby="profile-title">
+    <p class="eyebrow">{{ user.role }}</p>
+    {% if editing %}
+      <h1 id="profile-title">Edit your profile</h1>
+    {% else %}
+      <h1 id="profile-title">{{ user.name }}’s profile</h1>
+      <p><strong>Profile {{ completion_percent }}% complete</strong></p>
+      {% if completion_percent < 100 %}
+        {{ toast("Profile " ~ completion_percent ~ "% complete. Add your missing details to help organizers match you with campus events.", "error") }}
+      {% endif %}
+    {% endif %}
+
+    <div id="profile-message" aria-live="polite">
+      {% for category, message in get_flashed_messages(with_categories=true) %}
+        {{ toast(message, category) }}
+      {% endfor %}
+    </div>
+
+    {% if editing %}
+      <form method="post"
+            action="{{ url_for('auth.edit_profile') }}"
+            hx-post="{{ url_for('auth.edit_profile') }}"
+            hx-target="#profile-message"
+            hx-swap="innerHTML">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <p>
+          <label for="name">Full name</label><br>
+          <input id="name" name="name" type="text" value="{{ form_data.name }}"
+                 autocomplete="name" required maxlength="100">
+        </p>
+        <p>
+          <label for="dept">Department</label><br>
+          <input id="dept" name="dept" type="text" value="{{ form_data.dept }}"
+                 autocomplete="organization" maxlength="100">
+        </p>
+        <p>
+          <label for="skills">Skills and ratings</label><br>
+          <textarea id="skills" name="skills" rows="3"
+                    placeholder="Photography:4, Event planning:3">{{ form_data.skills }}</textarea>
+          <br><small>Separate entries with commas; ratings are whole numbers starting at 0.</small>
+        </p>
+        <button class="button button--primary" type="submit">Save profile</button>
+        <a class="button button--secondary" href="{{ url_for('auth.profile') }}">Cancel</a>
+      </form>
+    {% else %}
+      <dl>
+        <dt>Username</dt>
+        <dd>{{ user.username }}</dd>
+        <dt>Department</dt>
+        <dd>{{ user.dept or "Not added yet" }}</dd>
+      </dl>
+
+      <section aria-labelledby="skills-title">
+        <h2 id="skills-title">Skills</h2>
+        {% if skill_items %}
+          <ul>
+            {% for skill, rating in skill_items %}
+              <li>{{ skill }} · rating {{ rating }}</li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          {{ empty_state("No skills added yet. Add your skills to help organizers find you.", "Add your skills", url_for("auth.edit_profile")) }}
+        {% endif %}
+      </section>
+
+      <p><a class="button button--primary" href="{{ url_for('auth.edit_profile') }}">Edit profile</a></p>
+      <form method="post"
+            action="{{ url_for('auth.logout') }}"
+            hx-post="{{ url_for('auth.logout') }}"
+            hx-target="#profile-message"
+            hx-swap="innerHTML">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <button class="button button--secondary" type="submit">Sign out</button>
+      </form>
+    {% endif %}
+  </section>
+{% endblock %}
