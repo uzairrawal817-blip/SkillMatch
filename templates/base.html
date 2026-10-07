@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#17243b">
+    <title>{% block title %}SkillMatch{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    {% block head_extra %}{% endblock %}
+  </head>
+  <body>
+    <!-- JAVASCRIPT POLICY
+      Only the vendored htmx.min.js library and static/js/app.js are allowed.
+      Keep app.js under 100 lines total. Prefer HTMX attributes for dynamic updates;
+      add custom JavaScript only when Python and HTMX genuinely cannot handle the
+      browser-only behavior, and comment every function with that reason.
+    -->
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+
+    <header class="site-header">
+      <a class="brand" href="{{ url_for('home') }}" aria-label="SkillMatch home">
+        <span class="brand-mark" aria-hidden="true">S</span>
+        <span>SkillMatch</span>
+      </a>
+      <p class="site-tagline">Campus service, matched by skill.</p>
+      <nav class="top-nav" aria-label="Primary navigation">
+        <a href="{{ url_for('home') }}">Home</a>
+      </nav>
+    </header>
+
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="Role navigation placeholder">
+        <p class="sidebar-label">Workspace</p>
+        {% set active_role = current_user.role if current_user is defined and current_user else none %}
+        {% if active_role == "Organizer" %}
+          <p class="sidebar-placeholder">Organizer links will be added with the accounts and events features.</p>
+        {% elif active_role == "Student Volunteer" %}
+          <p class="sidebar-placeholder">Volunteer links will be added with the accounts and matching features.</p>
+        {% else %}
+          <p class="sidebar-placeholder">Role-specific links will appear here after account features are added.</p>
+        {% endif %}
+      </aside>
+
+      <div class="main-column">
+        <main id="main-content" class="page-content" tabindex="-1">
+          {% block content %}{% endblock %}
+        </main>
+        <footer class="site-footer">
+          <span>SkillMatch</span>
+          <span>Shared campus volunteering foundation</span>
+        </footer>
+      </div>
+    </div>
+
+    <div id="modal-root" aria-live="polite"></div>
+
+    <script src="{{ url_for('static', filename='vendor/htmx.min.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}" defer></script>
+  </body>
+</html>

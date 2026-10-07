@@ -1,44 +1,60 @@
-# [Project name]
+# SkillMatch
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+A campus event and volunteer-matching foundation that will connect student skills with organizer needs.
 
 ## Run & Operate
 
 - `pnpm --filter @workspace/api-server run dev` — run the API server (port 5000)
+- `PORT=8000 python app.py` — run the SkillMatch Flask app
 - `pnpm run typecheck` — full typecheck across all packages
 - `pnpm run build` — typecheck + build all packages
 - `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
-- `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
-- Required env: `DATABASE_URL` — Postgres connection string
+- `pnpm --filter @workspace/db run push` — shared database package for other API artifacts only; do not use it for SkillMatch
+- The SkillMatch foundation uses local JSON files; no database is configured for it.
 
 ## Stack
 
-- pnpm workspaces, Node.js 24, TypeScript 5.9
+- SkillMatch: Python Flask, Jinja2 templates, HTMX, and JSON files
+- pnpm workspaces, Node.js 24, TypeScript 5.9 (shared workspace services)
 - API: Express 5
-- DB: PostgreSQL + Drizzle ORM
+- Shared API database library: PostgreSQL + Drizzle ORM (not used by SkillMatch)
 - Validation: Zod (`zod/v4`), `drizzle-zod`
 - API codegen: Orval (from OpenAPI spec)
 - Build: esbuild (CJS bundle)
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- `app.py` — Flask app, home page, 404 handler, and four teammate Blueprint registration points
+- `data_store.py` — shared JSON load/save helpers; data files go in `data/`
+- `pyproject.toml` and `uv.lock` — Flask dependency declaration and Python lockfile
+- `templates/` — shared Jinja layout, macros, starter home page, and 404 page
+- `static/style.css` — SkillMatch styles and responsive breakpoints
+- `static/js/app.js` — browser-only modal dismissal behavior
+- `static/vendor/htmx.min.js` — locally vendored HTMX library
+- `models.md` — source of truth for the JSON record shapes
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- Feature areas are kept separate through four commented Blueprint registration points in `app.py`.
+- JSON files are project-local and accessed through `data_store.py`; no database is used for SkillMatch.
+- HTMX owns dynamic server-rendered updates; custom JavaScript is limited to modal dismissal.
 
 ## Product
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+SkillMatch is intended to match student volunteers to campus events based on their skills. This commit establishes shared scaffolding only; feature routes and behavior are intentionally not implemented.
 
 ## User preferences
 
-_Populate as you build — explicit user instructions worth remembering across sessions._
+- Use Flask, Jinja2, and HTMX; do not use React, Vue, or another frontend framework for SkillMatch.
+- Use JSON files through `data_store.py`; do not add a database.
+- Allowed JavaScript is only the vendored HTMX library and `static/js/app.js`, with `app.js` kept under 100 lines total. Check whether HTMX can handle a behavior before adding JavaScript; every function in `app.js` needs a one-line reason Python/HTMX cannot handle it.
+- Keep the four feature areas independently owned; each teammate makes their own GitHub commits.
+- Leave changes unstaged. Do not run `git add`, `git commit`, or `git push`.
 
 ## Gotchas
 
-_Populate as you build — sharp edges, "always run X before Y" rules._
+- Do not store raw passwords; future password-based account features must store hashes.
+- Keep browser-side behavior in HTMX unless a documented browser-only exception is necessary.
 
 ## Pointers
 
