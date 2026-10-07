@@ -1,0 +1,43 @@
+Build the foundation for "SkillMatch," a campus event/volunteer-matching 
+website, built by 4 students each owning a separate feature area with 
+their own GitHub commits.
+
+HARD RULES — apply to this prompt AND every future prompt in this repo:
+- Stack: Python Flask + Jinja2 templates + HTMX for dynamic page updates. 
+No React, no Vue, no separate frontend framework.
+- Storage: JSON files via a shared data_store.py. No database.
+- Allowed JavaScript, and ONLY this: the vendored htmx.min.js library, 
+plus one small static/js/app.js (stays under 100 lines total across the 
+whole project). Every function inside app.js must have a one-line comment 
+explaining exactly why Python/HTMX genuinely cannot do it instead.
+- Before writing ANY JavaScript for ANY feature: first check if an HTMX 
+attribute (hx-get, hx-post, hx-trigger, hx-swap) can do it instead. Only 
+fall back to app.js if the answer is genuinely no.
+
+COMMIT POLICY: Make all the file changes described below, but do not run 
+git add, git commit, or git push yourself. Leave the changes unstaged so 
+I can review and commit them under my own GitHub account.
+
+Build:
+1. app.py — main Flask app with 4 clearly commented placeholder sections, 
+one per teammate, for registering their own Blueprint.
+2. data_store.py — load(filename)/save(filename, data) using json, 
+storing files in /data.
+3. templates/base.html — navbar, role-aware sidebar placeholder, a 
+#modal-root container, and a visible <!-- JAVASCRIPT POLICY --> comment 
+restating the hard rules above.
+4. templates/macros.html with reusable Jinja macros:
+   - toast(message, type) — success/error notification, auto-dismissing 
+   via CSS animation only, no JS
+   - empty_state(message, cta_text, cta_link) — shown when a list is empty
+   - modal(title) — reusable modal using HTMX to load content into 
+   #modal-root, with Esc/click-outside/close handled in app.js (this is 
+   one of the few genuinely justified JS cases)
+5. templates/404.html wired to Flask's errorhandler(404).
+6. static/style.css — a distinctive, non-default color and type system, 
+with explicit responsive breakpoints at 900px, 650px, 430px, 390px, and 
+360px, and visible focus outlines on every interactive element.
+7. models.md documenting the exact shape of users.json, events.json, 
+applications.json.
+
+No feature logic yet — just this shared, documented skeleton.
