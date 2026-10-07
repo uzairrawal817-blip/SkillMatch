@@ -31,10 +31,11 @@ auth_bp = Blueprint("auth", __name__)
 
 @auth_bp.record_once
 def _configure_session(state):
-    """Configure signed, browser-protected sessions using the Replit secret."""
+    """Configure signed, browser-protected sessions."""
     secret = os.environ.get("SESSION_SECRET")
     if not secret:
-        raise RuntimeError("Set SESSION_SECRET in Replit Secrets before using account routes.")
+        # Local-development fallback only; set SESSION_SECRET in Replit Secrets before public deployment.
+        secret = secrets.token_urlsafe(32)
 
     state.app.config.update(
         SECRET_KEY=secret,
